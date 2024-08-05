@@ -1,4 +1,4 @@
-# What is this code repository?
+# What is this code repository?  
 
 This code repository contains code to use Ansible® with Amazon WorkSpaces. Specifically, it includes an Ansible dynamic inventory provider, and some starter Ansible playbooks.
 
