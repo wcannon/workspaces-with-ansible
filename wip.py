@@ -8,6 +8,7 @@ from botocore.config import Config
 import pprint
 
 
+
 class Inventory:
     def __init__(self, region, directory=None, workspaces=None):
         self.region = region
@@ -24,12 +25,21 @@ class Inventory:
         self.generate_inventory()
 
     def get_client(self):
-        self.client = boto3.client('workspaces', config=self.config, region_name=self.region)
-        self.paginator = self.client.get_paginator("describe_workspaces")
-    
+        try:
+            self.client = boto3.client('workspaces', config=self.config, region_name=self.region)
+            self.paginator = self.client.get_paginator("describe_workspaces")
+        except Exception as e:
+            print(f"Exception: {e}")
+            raise(e)
+        
     def get_tags(self, workspace_id):
         '''Create a list of group names from aws workspace tags where key and value become key-value in lowercase'''
-        tags_list = self.client.describe_tags(ResourceId=workspace_id).get('TagList', '')
+        try:
+            tags_list = self.client.describe_tags(ResourceId=workspace_id).get('TagList', '')
+        except Exception as e:
+            print(f"Exception: {e}")
+            raise(e)
+        
         group_names = []
         for item in tags_list:
             key = item.get('Key', '').lower()
@@ -121,7 +131,7 @@ class Inventory:
 
             # Handling the automatic build of ansible group names based off workspace tags
             group_names = self.get_tags(workspace_id)
-            print(f"group_names are: {group_names}")
+            #print(f"group_names are: {group_names}")
 
             for grp_name in group_names:
                 if grp_name not in self.inventory:
@@ -172,4 +182,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(f"Error / Exception: {e}")
